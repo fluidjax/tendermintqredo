@@ -39,14 +39,14 @@ func loadState(db dbm.DB) State {
 	state.db = db
 	return state
 }
-sssss
+
 func saveState(state State) {
 	stateBytes, err := json.Marshal(state)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("stateKey %s", stateKey)
-	fmt.Println("stateBytes %s", stateBytes)
+	fmt.Println("stateKey %s", string(stateKey))
+	fmt.Println("stateBytes %s", string(stateBytes))
 	state.db.Set(stateKey, stateBytes)
 }
 
@@ -60,7 +60,6 @@ var _ types.Application = (*KVStoreApplication)(nil)
 
 type KVStoreApplication struct {
 	types.BaseApplication
-
 	state State
 }
 
@@ -92,10 +91,10 @@ func (app *KVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.Respo
 
 	events := []types.Event{
 		{
-			Type: "app",
+			Type: "tag", // curl "localhost:26657/tx_search?query=\"tag.name='chris'\""
 			Attributes: []cmn.KVPair{
-				{Key: []byte("creator"), Value: []byte("chris")},
-				{Key: []byte("name"), Value: []byte("chris")},
+				{Key: []byte("name"), Value: []byte("john")},
+				{Key: []byte("name"), Value: []byte("matt")},
 				{Key: []byte("key"), Value: key},
 			},
 		},

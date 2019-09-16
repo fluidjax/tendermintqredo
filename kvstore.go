@@ -99,6 +99,12 @@ func (app *KVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.Respo
 		},
 	}
 
+	tags := []cmn.KVPair{
+		{[]byte("account.name"), []byte("igor")},
+		{[]byte("account.address"), []byte("0xdeadbeef")},
+		{[]byte("tx.amount"), []byte("7")},
+	}
+
 	return types.ResponseDeliverTx{Code: code.CodeTypeOK, Events: events}
 }
 

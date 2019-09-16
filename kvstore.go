@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/dgraph-io/badger"
 	"github.com/tendermint/tendermint/abci/example/code"
 	"github.com/tendermint/tendermint/abci/types"
 	cmn "github.com/tendermint/tendermint/libs/common"
@@ -63,7 +62,7 @@ type KVStoreApplication struct {
 	state State
 }
 
-func NewKVStoreApplication(db *badger.DB) *KVStoreApplication {
+func NewKVStoreApplication() *KVStoreApplication {
 	state := loadState(dbm.NewMemDB())
 	return &KVStoreApplication{state: state}
 }
@@ -97,12 +96,6 @@ func (app *KVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.Respo
 				{Key: []byte("key"), Value: key},
 			},
 		},
-	}
-
-	tags := []cmn.KVPair{
-		{[]byte("account.name"), []byte("igor")},
-		{[]byte("account.address"), []byte("0xdeadbeef")},
-		{[]byte("tx.amount"), []byte("7")},
 	}
 
 	return types.ResponseDeliverTx{Code: code.CodeTypeOK, Events: events}

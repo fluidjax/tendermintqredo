@@ -60,7 +60,7 @@ func (app *PersistentKVStoreApplication) Info(req types.RequestInfo) types.Respo
 	res.LastBlockAppHash = app.app.state.AppHash
 	return res
 }
-iiii
+
 func (app *PersistentKVStoreApplication) SetOption(req types.RequestSetOption) types.ResponseSetOption {
 	return app.app.SetOption(req)
 }
@@ -198,7 +198,7 @@ func (app *PersistentKVStoreApplication) execValidatorTx(tx []byte) types.Respon
 	}
 
 	// update
-	return app.updateValidator(types.Ed25519ValidatorUpdate(pubkey, power))
+	return app.updateValidator(types.Ed25519ValidatorUpdate(pubkey, int64(power)))
 }
 
 // add, update, or remove a validator

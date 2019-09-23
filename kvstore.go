@@ -62,7 +62,7 @@ type KVStoreApplication struct {
 	state State
 }
 
-func NewKVStoreApplication() *KVStoreApplication {
+func NewKVStoreApplication2() *KVStoreApplication {
 	state := loadState(dbm.NewMemDB())
 	return &KVStoreApplication{state: state}
 }

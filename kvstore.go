@@ -1,16 +1,15 @@
 package tendermintqredo
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 
 	"github.com/tendermint/tendermint/abci/example/code"
 	"github.com/tendermint/tendermint/abci/types"
-	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/version"
 	dbm "github.com/tendermint/tm-db"
+	cmn "github.com/tendermint/tendermint/tmlibs/common"
 )
 
 var (
@@ -76,29 +75,71 @@ func (app *KVStoreApplication) Info(req types.RequestInfo) (resInfo types.Respon
 	}
 }
 
+type BlockChainTX struct {
+	Processor   string
+	SenderID    string
+	RecipientID []string
+	Payload     []byte
+	TXhash      []byte
+	Tags        map[string]string
+}
+
 // tx is either "key=value" or just arbitrary bytes
 func (app *KVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.ResponseDeliverTx {
-	var key, value []byte
-	parts := bytes.Split(req.Tx, []byte("="))
-	if len(parts) == 2 {
-		key, value = parts[0], parts[1]
-	} else {
-		key, value = req.Tx, req.Tx
+	//Use JSON format message for now - its quicker and easier to add new fields
+	payload := BlockChainTX{}
+
+	err := json.Unmarshal(req.Tx, &payload)
+
+	if err != nil {
+		return types.ResponseDeliverTx{}
 	}
 
-	app.state.db.Set(prefixKey(key), value)
-	app.state.Size += 1
+	//senderID := payload.SenderID
+	//recipientID := payload.RecipientID
+	TXHash := payload.TXhash
+
+	var atts []cmn.KVPair
+	atts = append(atts, cmn.KVPair{Key: []byte("name"), Value: []byte("chris")})
+	atts = append(atts, cmn.KVpair{Key: []byte("key"), Value: TXHash})
 
 	events := []types.Event{
 		{
-			Type: "tag", // curl "localhost:26657/tx_search?query=\"tag.name='chris'\""
-			Attributes: []cmn.KVPair{
-				{Key: []byte("name"), Value: []byte("john")},
-				{Key: []byte("name"), Value: []byte("matt")},
-				{Key: []byte("key"), Value: key},
-			},
+			Type:       "tag", // curl "localhost:26657/tx_search?query=\"tag.name='chris'\""
+			Attributes: atts,
 		},
 	}
+
+	// events := []types.Event{
+	// 	{
+	// 		Type: "tag", // curl "localhost:26657/tx_search?query=\"tag.name='chris'\""
+	// 		Attributes: []cmn.KVPair{
+	// 			{Key: []byte("name"), Value: []byte("john")},
+	// 			{Key: []byte("name"), Value: []byte("matt")},
+	// 			{Key: []byte("key"), Value: key},
+	// 		},
+
+	// var key, value []byte
+	// parts := bytes.Split(req.Tx, []byte("="))
+	// if len(parts) == 2 {
+	// 	key, value = parts[0], parts[1]
+	// } else {
+	// 	key, value = req.Tx, req.Tx
+	// }
+
+	// app.state.db.Set(prefixKey(key), value)
+	// app.state.Size += 1
+
+	// events = []types.Event{
+	// 	{
+	// 		Type: "tag", // curl "localhost:26657/tx_search?query=\"tag.name='chris'\""
+	// 		Attributes: []cmn.KVPair{
+	// 			{Key: []byte("name"), Value: []byte("john")},
+	// 			{Key: []byte("name"), Value: []byte("matt")},
+	// 			{Key: []byte("key"), Value: key},
+	// 		},
+	// 	},
+	// }
 
 	return types.ResponseDeliverTx{Code: code.CodeTypeOK, Events: events}
 }

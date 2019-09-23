@@ -7,9 +7,9 @@ import (
 
 	"github.com/tendermint/tendermint/abci/example/code"
 	"github.com/tendermint/tendermint/abci/types"
+	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/version"
 	dbm "github.com/tendermint/tm-db"
-	cmn "github.com/tendermint/tendermint/tmlibs/common"
 )
 
 var (
@@ -101,7 +101,7 @@ func (app *KVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.Respo
 
 	var atts []cmn.KVPair
 	atts = append(atts, cmn.KVPair{Key: []byte("name"), Value: []byte("chris")})
-	atts = append(atts, cmn.KVpair{Key: []byte("key"), Value: TXHash})
+	atts = append(atts, cmn.KVPair{Key: []byte("key"), Value: TXHash})
 
 	events := []types.Event{
 		{
